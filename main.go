@@ -7,6 +7,8 @@ import (
 	//"github.com/google/gxui/gxfont"
 	"github.com/google/gxui/samples/flags"
 	"github.com/google/gxui/math"
+
+	"github.com/FactomProject/GUIWallet/FactoidAPI"
 )
 
 
@@ -49,6 +51,9 @@ func appMain(driver gxui.Driver) {
 	window.OnClose(driver.Terminate)
 }*/
 
+func test() {
+	FactoidAPI.GetAddresses()
+}
 
 func overview(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
@@ -60,6 +65,12 @@ func overview(theme gxui.Theme) gxui.Control {
 	label.SetText("Overview")
 
 	layout.AddChild(label)
+
+	button := theme.CreateButton()
+	button.SetHorizontalAlignment(gxui.AlignCenter)
+	button.SetText("Test")
+	button.OnClick(func(gxui.MouseEvent) { test() })
+	layout.AddChild(button)
 
 	return layout
 }
