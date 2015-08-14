@@ -55,6 +55,10 @@ func test() {
 	FactoidAPI.GetAddresses()
 }
 
+func getBalances() string {
+	return FactoidAPI.GetAddresses()
+}
+
 func overview(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
 
@@ -63,14 +67,30 @@ func overview(theme gxui.Theme) gxui.Control {
 	label := theme.CreateLabel()
 	label.SetFont(font)
 	label.SetText("Overview")
-
 	layout.AddChild(label)
+	
+	textBox := theme.CreateTextBox()
+	textBox.SetFont(font)
+	textBox.SetText("")
+	textBox.SetSize(math.Size{W: 300, H: 300})
 
 	button := theme.CreateButton()
 	button.SetHorizontalAlignment(gxui.AlignCenter)
 	button.SetText("Test")
 	button.OnClick(func(gxui.MouseEvent) { test() })
 	layout.AddChild(button)
+
+	button2 := theme.CreateButton()
+	button2.SetHorizontalAlignment(gxui.AlignCenter)
+	button2.SetText("GetBalances")
+	button2.OnClick(func(gxui.MouseEvent) {
+			balances:=getBalances()
+			textBox.SetText(balances)
+			textBox.SetSize(math.Size{W: 400, H: 400})
+		})
+
+	layout.AddChild(button2)
+	layout.AddChild(textBox)
 
 	return layout
 }

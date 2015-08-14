@@ -18,7 +18,7 @@ var serverfactoid = "localhost:8089"
 var badChar,_ = regexp.Compile("[^A-Za-z0-9_-]")
 
 type Response struct {
-	Body string
+	Response string
 	Success bool
 }
 
@@ -93,10 +93,10 @@ func GenerateAddress(addressType, addressName string) error {
 	return nil
 }
 
-func GetAddresses() {
+func GetAddresses() string {
 	str := fmt.Sprintf("http://%s/v1/factoid-get-addresses/", serverfactoid)
-	SendCommand(true, str)
-	return 
+	resp, _:=SendCommand(true, str)
+	return resp.Response
 }
 
 func GetTransactions() {
@@ -127,8 +127,7 @@ func FactoidDeleteTransaction(tx string) {
 	str := fmt.Sprintf("http://%s/v1/factoid-delete-transaction/%s", serverfactoid, tx)
 	SendCommand(false, str)
 	
-	return 
-	
+	return
 }
 
 func FactoidAddFee(key, name string) {	
