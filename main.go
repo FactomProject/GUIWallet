@@ -61,6 +61,9 @@ func getBalances() string {
 
 func overview(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
+	layout.SetPadding(math.ZeroSpacing)
+	layout.SetMargin(math.ZeroSpacing)
+	layout.SetSize(math.Size{W: 400, H: 400})
 
 	font := theme.DefaultFont()
 	
@@ -72,7 +75,7 @@ func overview(theme gxui.Theme) gxui.Control {
 	textBox := theme.CreateTextBox()
 	textBox.SetFont(font)
 	textBox.SetText("")
-	textBox.SetSize(math.Size{W: 300, H: 300})
+	textBox.SetDesiredWidth(800)
 
 	button := theme.CreateButton()
 	button.SetHorizontalAlignment(gxui.AlignCenter)
@@ -86,7 +89,6 @@ func overview(theme gxui.Theme) gxui.Control {
 	button2.OnClick(func(gxui.MouseEvent) {
 			balances:=getBalances()
 			textBox.SetText(balances)
-			textBox.SetSize(math.Size{W: 400, H: 400})
 		})
 
 	layout.AddChild(button2)
