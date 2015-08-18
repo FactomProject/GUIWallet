@@ -1,16 +1,17 @@
 package main
 
 import (
-
 	"github.com/google/gxui"
 	"github.com/google/gxui/drivers/gl"
 	//"github.com/google/gxui/gxfont"
-	"github.com/google/gxui/samples/flags"
 	"github.com/google/gxui/math"
+	"github.com/google/gxui/samples/flags"
 
-	"github.com/FactomProject/GUIWallet/FactoidAPI"
+	//"github.com/FactomProject/GUIWallet/FactoidAPI"
+	"github.com/FactomProject/fctwallet/Wallet"
+
+	"fmt"
 )
-
 
 func appMain(driver gxui.Driver) {
 	theme := flags.CreateTheme(driver)
@@ -30,6 +31,7 @@ func appMain(driver gxui.Driver) {
 	window.OnClose(driver.Terminate)
 	window.SetPadding(math.Spacing{L: 10, T: 10, R: 10, B: 10})
 }
+
 /*
 func appMain(driver gxui.Driver) {
 	theme := flags.CreateTheme(driver)
@@ -52,11 +54,35 @@ func appMain(driver gxui.Driver) {
 }*/
 
 func test() {
-	FactoidAPI.GetAddresses()
+	fmt.Printf("Test\n")
+	tx, err := GetTransactions()
+	fmt.Printf("%v, %v\n", tx, err)
 }
 
-func getBalances() string {
-	return FactoidAPI.GetAddresses()
+func getAddressesString() string {
+	addresses, err := GetAddresses()
+	if err != nil {
+		return err.Error()
+	}
+	answer := "FactoidAddresses:\n"
+	for _, v := range addresses.FactoidAddresses {
+		answer += fmt.Sprintf("%v\t%v\t%v\n", v.Name, v.Address, v.Balance)
+	}
+	answer += "ECAddresses:\n"
+	for _, v := range addresses.ECAddresses {
+		answer += fmt.Sprintf("%v\t%v\t%v\n", v.Name, v.Address, v.Balance)
+	}
+	return answer
+}
+
+func getBalancesString() string {
+	balances, err := GetBalances()
+	if err != nil {
+		return err.Error()
+	}
+	answer := fmt.Sprintf("Factoid Balance:\t%v\n", balances.FactoidBalances)
+	answer += fmt.Sprintf("EC Balance:\t%v\n", balances.ECBalances)
+	return answer
 }
 
 func overview(theme gxui.Theme) gxui.Control {
@@ -66,12 +92,12 @@ func overview(theme gxui.Theme) gxui.Control {
 	layout.SetSize(math.Size{W: 400, H: 400})
 
 	font := theme.DefaultFont()
-	
+
 	label := theme.CreateLabel()
 	label.SetFont(font)
 	label.SetText("Overview")
 	layout.AddChild(label)
-	
+
 	textBox := theme.CreateTextBox()
 	textBox.SetFont(font)
 	textBox.SetText("")
@@ -85,13 +111,22 @@ func overview(theme gxui.Theme) gxui.Control {
 
 	button2 := theme.CreateButton()
 	button2.SetHorizontalAlignment(gxui.AlignCenter)
-	button2.SetText("GetBalances")
+	button2.SetText("GetAddresses")
 	button2.OnClick(func(gxui.MouseEvent) {
-			balances:=getBalances()
-			textBox.SetText(balances)
-		})
-
+		balances := getAddressesString()
+		textBox.SetText(balances)
+	})
 	layout.AddChild(button2)
+
+	button3 := theme.CreateButton()
+	button3.SetHorizontalAlignment(gxui.AlignCenter)
+	button3.SetText("GetBalances")
+	button3.OnClick(func(gxui.MouseEvent) {
+		balances := getBalancesString()
+		textBox.SetText(balances)
+	})
+	layout.AddChild(button3)
+
 	layout.AddChild(textBox)
 
 	return layout
@@ -101,7 +136,7 @@ func send(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
 
 	font := theme.DefaultFont()
-	
+
 	label := theme.CreateLabel()
 	label.SetFont(font)
 	label.SetText("Send")
@@ -115,7 +150,7 @@ func receive(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
 
 	font := theme.DefaultFont()
-	
+
 	label := theme.CreateLabel()
 	label.SetFont(font)
 	label.SetText("receive")
@@ -129,7 +164,7 @@ func transactions(theme gxui.Theme) gxui.Control {
 	layout := theme.CreateLinearLayout()
 
 	font := theme.DefaultFont()
-	
+
 	label := theme.CreateLabel()
 	label.SetFont(font)
 	label.SetText("Transactions")
@@ -140,5 +175,22 @@ func transactions(theme gxui.Theme) gxui.Control {
 }
 
 func main() {
+	initWallet()
 	gl.StartDriver(appMain)
+}
+
+func initWallet() {
+	fmt.Printf("\ninitWallet\n")
+	keys, _ := Wallet.GetWalletNames()
+	if len(keys) == 0 {
+		for i := 1; i <= 10; i++ {
+			name := fmt.Sprintf("%02d-Fountain", i)
+			_, err := Wallet.GenerateFctAddress([]byte(name), 1, 1)
+			if err != nil {
+				fmt.Printf("\nError - %v\n", err)
+				return
+			}
+		}
+	}
+	fmt.Printf("initWallet done\n")
 }
